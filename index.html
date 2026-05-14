@@ -178,6 +178,28 @@ body.splitscreen .split-label { display: block; }
 
 #split-toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(0,0,0,.92); border: 1px solid #fc0; color: #fc0; padding: 14px 28px; font-size: 13px; letter-spacing: 2px; z-index: 150; opacity: 0; transition: opacity .4s; pointer-events: none; text-align: center; }
 #split-toast.show { opacity: 1; }
+
+/* Flash overlay (flashbang) - per viewport */
+.flash-overlay { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 60; transition: opacity .15s linear; }
+.flash-overlay.active { opacity: 1; }
+
+/* Boost overlay (energizante) */
+.boost-vig { position: absolute; inset: 0; pointer-events: none; z-index: 16; opacity: 0; transition: opacity .3s; box-shadow: inset 0 0 80px rgba(0,200,255,0.45); }
+.boost-vig.active { opacity: 1; animation: boostPulse 0.6s infinite; }
+@keyframes boostPulse { 50% { box-shadow: inset 0 0 120px rgba(0,200,255,0.7); } }
+
+/* Grenade/Item slots HUD */
+.p-grenades { position: absolute; bottom: 14px; left: 14px; pointer-events: none; z-index: 20; display: flex; gap: 8px; flex-direction: column; }
+.gr-row { display: flex; gap: 6px; align-items: center; font-size: 11px; color: #fc0; background: rgba(0,0,0,.65); padding: 3px 8px; border-left: 2px solid #fc0; letter-spacing: 1px; }
+.gr-row.empty { color: #555; border-color: #333; }
+.gr-row .gr-key { color: #888; font-size: 9px; margin-right: 4px; }
+.boost-hud { font-size: 11px; color: #0cf; background: rgba(0,30,50,.7); padding: 3px 8px; border-left: 2px solid #0cf; letter-spacing: 1px; display: none; }
+.boost-hud.active { display: block; }
+
+/* Shop close button (X) */
+.shop-close-btn { position: absolute; top: 8px; right: 12px; background: #200; color: #f55; border: 1px solid #f33; width: 32px; height: 32px; font-size: 18px; font-weight: bold; cursor: pointer; font-family: inherit; line-height: 1; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+.shop-close-btn:hover { background: #f22; color: #fff; box-shadow: 0 0 12px #f33; }
+.spanel { position: relative; }
 </style>
 </head>
 <body>
@@ -200,13 +222,23 @@ body.splitscreen .split-label { display: block; }
     <div class="cr-hud"><div class="hlbl">CRÉDITOS</div><div class="cr-num" id="cr1">1000</div></div>
     <div class="p-slots"><div class="slot on" id="sl1a">1 · CUCHILLO</div><div class="slot" id="sl1b">2 · —</div></div>
     <div class="reload-ind" id="ri1">RECARGANDO...</div><div class="killfeed" id="kf1"></div><div class="interact-prompt" id="int1"></div><div class="hit-ind" id="hi1">✖</div><div class="dmg-vig" id="dv1"></div>
+    <div class="flash-overlay" id="fl1"></div>
+    <div class="boost-vig" id="bv1"></div>
+    <div class="p-grenades" id="gren1">
+      <div class="gr-row empty" id="gflash1"><span class="gr-key">[G]</span>FLASH ×0</div>
+      <div class="gr-row empty" id="gsmoke1"><span class="gr-key">[H]</span>HUMO ×0</div>
+      <div class="gr-row empty" id="genergy1"><span class="gr-key">[J]</span>ENERGIZANTE ×0</div>
+      <div class="boost-hud" id="boost1">⚡ BOOST 60s</div>
+    </div>
     <div class="round-banner"><div class="rb-main" id="rbm1"></div><div class="rb-sub" id="rbs1"></div><div class="rb-hint" id="rbh1"></div></div>
     <div class="round-tracker"><div class="rt-round" id="rtr1">RONDA 1</div><div class="rt-kills" id="rtk1"></div></div><div class="gp-ind" id="gpi1"></div>
     <div class="shop-overlay" id="shop1">
       <div class="spanel">
+        <button class="shop-close-btn" id="shop-close1" title="Cerrar tienda">✕</button>
         <h2 id="stitle1">🛒 Armería — [B] cerrar</h2><div class="shop-cr" id="scr1"></div>
         <div class="ss"><h3>⚔ Armas</h3><div class="si-grid" id="sw1"></div></div>
         <div class="ss"><h3>🛡 Protección</h3><div class="si-grid" id="sa1"></div></div>
+        <div class="ss"><h3>💣 Equipamiento</h3><div class="si-grid" id="se1"></div></div>
       </div>
     </div>
   </div>
@@ -231,13 +263,23 @@ body.splitscreen .split-label { display: block; }
     <div class="cr-hud"><div class="hlbl">CRÉDITOS</div><div class="cr-num" id="cr2">1000</div></div>
     <div class="p-slots"><div class="slot on" id="sl2a">1 · CUCHILLO</div><div class="slot" id="sl2b">2 · —</div></div>
     <div class="reload-ind" id="ri2">RECARGANDO...</div><div class="killfeed" id="kf2"></div><div class="interact-prompt" id="int2"></div><div class="hit-ind" id="hi2">✖</div><div class="dmg-vig" id="dv2"></div>
+    <div class="flash-overlay" id="fl2"></div>
+    <div class="boost-vig" id="bv2"></div>
+    <div class="p-grenades" id="gren2">
+      <div class="gr-row empty" id="gflash2"><span class="gr-key">LB</span>FLASH ×0</div>
+      <div class="gr-row empty" id="gsmoke2"><span class="gr-key">RB+LB</span>HUMO ×0</div>
+      <div class="gr-row empty" id="genergy2"><span class="gr-key">RS</span>ENERGIZANTE ×0</div>
+      <div class="boost-hud" id="boost2">⚡ BOOST 60s</div>
+    </div>
     <div class="round-banner"><div class="rb-main" id="rbm2"></div><div class="rb-sub" id="rbs2"></div><div class="rb-hint" id="rbh2"></div></div>
     <div class="round-tracker"><div class="rt-round" id="rtr2">RONDA 1</div><div class="rt-kills" id="rtk2"></div></div><div class="gp-ind connected" id="gpi2">🎮 Sin mando</div>
     <div class="shop-overlay" id="shop2">
       <div class="spanel">
+        <button class="shop-close-btn" id="shop-close2" title="Cerrar tienda">✕</button>
         <h2 id="stitle2">🛒 Armería J2 — [Y/△] cerrar</h2><div class="shop-cr" id="scr2"></div>
         <div class="ss"><h3>⚔ Armas</h3><div class="si-grid" id="sw2"></div></div>
         <div class="ss"><h3>🛡 Protección</h3><div class="si-grid" id="sa2"></div></div>
+        <div class="ss"><h3>💣 Equipamiento</h3><div class="si-grid" id="se2"></div></div>
       </div>
     </div>
   </div>
@@ -302,6 +344,7 @@ function playGunSound(wepId) {
         case 'shotgun': audioSys.gunNoise.volume.value = 5; audioSys.gunNoise.triggerAttackRelease("8n", now); audioSys.gunThump.triggerAttackRelease("C1", "8n", now); setTimeout(() => { if(audioReady) audioSys.mechSynth.triggerAttackRelease("32n"); }, 400); break;
         case 'rifle': audioSys.gunNoise.triggerAttackRelease("16n", now); audioSys.gunThump.triggerAttackRelease("C2", "16n", now); break;
         case 'sniper': audioSys.gunNoise.volume.value = 8; audioSys.gunNoise.triggerAttackRelease("4n", now); audioSys.gunThump.triggerAttackRelease("C0", "4n", now); setTimeout(() => { if(audioReady) audioSys.mechSynth.triggerAttackRelease("16n"); }, 600); break;
+        case 'railgun': audioSys.gunNoise.volume.value = 6; audioSys.hitSynth.triggerAttackRelease(["C5","G5","C6"], "8n", now); audioSys.gunThump.triggerAttackRelease("C1", "4n", now); audioSys.mechSynth.triggerAttackRelease("8n", now + 0.05); break;
         case 'knife': audioSys.stepSynth.triggerAttackRelease("32n", now); break;
     }
     setTimeout(() => { if (audioReady && audioSys.gunNoise) audioSys.gunNoise.volume.value = 0; }, 100);
@@ -316,10 +359,10 @@ const MAX_ROUNDS = 10;
 let locked = false;
 
 const BTN_NAMES = ['A','B','X','Y','LB','RB','LT','RT','SEL','START','LS','RS','UP','DOWN','LEFT','RIGHT'];
-let BIND_P1 = { up:'KeyW', down:'KeyS', left:'KeyA', right:'KeyD', jump:'Space', sprint:'ShiftLeft', crouch:'ControlLeft', reload:'KeyR', w1:'Digit1', w2:'Digit2', shop:'KeyB', shoot:'Mouse0', aim:'Mouse2', interact:'KeyE', score:'Tab' };
-let BIND_P2 = { jump:0, sprint:10, crouch:1, reload:2, wNext:5, wPrev:4, shop:9, close:3, shoot:7, aim:6, buy:0, interact:2, score:8 }; 
+let BIND_P1 = { up:'KeyW', down:'KeyS', left:'KeyA', right:'KeyD', jump:'Space', sprint:'ShiftLeft', crouch:'ControlLeft', reload:'KeyR', w1:'Digit1', w2:'Digit2', shop:'KeyB', shoot:'Mouse0', aim:'Mouse2', interact:'KeyE', score:'Tab', gFlash:'KeyG', gSmoke:'KeyH', gEnergy:'KeyJ' };
+let BIND_P2 = { jump:0, sprint:10, crouch:1, reload:2, wNext:5, wPrev:4, shop:9, close:3, shoot:7, aim:6, buy:0, interact:2, score:8, gFlash:4, gSmoke:5, gEnergy:11 }; 
 
-const BIND_LABELS = { up:'Mover Adelante', down:'Mover Atrás', left:'Mover Izquierda', right:'Mover Derecha', jump:'Saltar', sprint:'Correr', crouch:'Agacharse', reload:'Recargar', w1:'Arma 1', w2:'Arma 2', shop:'Abrir Tienda', shoot:'Disparar', aim:'Apuntar', interact:'Interactuar/Recoger', score:'Tabla Puntuación', wNext:'Sig. Arma', wPrev:'Ant. Arma', close:'Cerrar Tienda', buy:'Comprar (Tienda)' };
+const BIND_LABELS = { up:'Mover Adelante', down:'Mover Atrás', left:'Mover Izquierda', right:'Mover Derecha', jump:'Saltar', sprint:'Correr', crouch:'Agacharse', reload:'Recargar', w1:'Arma 1', w2:'Arma 2', shop:'Abrir Tienda', shoot:'Disparar', aim:'Apuntar', interact:'Interactuar/Recoger', score:'Tabla Puntuación', wNext:'Sig. Arma', wPrev:'Ant. Arma', close:'Cerrar Tienda', buy:'Comprar (Tienda)', gFlash:'Lanzar Flash', gSmoke:'Lanzar Humo', gEnergy:'Usar Energizante' };
 
 const WDATA = {
   knife:   { name:'CUCHILLO', type:'melee', dmgFront:50, dmgBack:75, firerate:500, range:2.2 },
@@ -327,10 +370,11 @@ const WDATA = {
   smg:     { name:'SUBFUSIL', type:'ranged', dmgChest:30, dmgHead:80, dmgLegs:20, firerate:90, range:48, ammoKey:'smg', auto:true, spread:.018 },
   shotgun: { name:'ESCOPETA', type:'ranged', dmgChest:20, dmgHead:40, dmgLegs:10, firerate:850, range:16, ammoKey:'shotgun', auto:false, spread:.10, pellets:5, ammoPerShot:5 },
   rifle:   { name:'FUSIL',    type:'ranged', dmgChest:40, dmgHead:100, dmgLegs:25, firerate:130, range:80, ammoKey:'rifle', auto:true, spread:.006 },
-  sniper:  { name:'SNIPER',   type:'ranged', dmgChest:150, dmgHead:300, dmgLegs:80, firerate:1500, range:200, ammoKey:'sniper', auto:false, spread:.0001 }
+  sniper:  { name:'SNIPER',   type:'ranged', dmgChest:150, dmgHead:300, dmgLegs:80, firerate:1500, range:200, ammoKey:'sniper', auto:false, spread:.0001 },
+  railgun: { name:'RAILGUN',  type:'ranged', dmgChest:120, dmgHead:250, dmgLegs:100, firerate:1100, range:250, ammoKey:'railgun', auto:false, spread:.0, pierceWalls:true, pierceTargets:true, chargeMs:450 }
 };
-const MAX_AMMO = { pistol:12, smg:20, shotgun:15, rifle:30, sniper:5 };
-const RELOAD_MS = { pistol:1500, smg:1800, shotgun:2200, rifle:2500, sniper:3000 };
+const MAX_AMMO = { pistol:12, smg:20, shotgun:15, rifle:30, sniper:5, railgun:4 };
+const RELOAD_MS = { pistol:1500, smg:1800, shotgun:2200, rifle:2500, sniper:3000, railgun:3500 };
 
 const SHOP_DATA = [
   { id:'pistol', name:'Pistola',       type:'weapon', price:200,  stats:'25/75/15 daño\n12 balas' },
@@ -338,8 +382,12 @@ const SHOP_DATA = [
   { id:'shotgun',name:'Escopeta',      type:'weapon', price:600,  stats:'5×(20/40/10) daño\n15 balas · gasta 5' },
   { id:'rifle',  name:'Fusil',         type:'weapon', price:1000, stats:'40/100/25 daño\n30 balas · auto' },
   { id:'sniper', name:'Francotirador', type:'weapon', price:2000, stats:'150/300/80 daño\n5 balas · letal' },
+  { id:'railgun',name:'Railgun',       type:'weapon', price:2800, stats:'120/250/100 daño\n4 balas · ATRAVIESA\nparedes y enemigos' },
   { id:'armor50', name:'Chaleco Lig.', type:'armor',  price:500,  bonus:50, stats:'+50 armadura' },
   { id:'armor100',name:'Chaleco Pes.', type:'armor',  price:1000, bonus:100, stats:'+100 armadura' },
+  { id:'flash',   name:'Flashbang',    type:'equip',  price:200,  stats:'Ciega 2s al jugador\nque la mire\n[G/LB] lanzar' },
+  { id:'smoke',   name:'Granada Humo', type:'equip',  price:300,  stats:'Bloquea visión 10s\nradio 5m\n[H/LB+RB] lanzar' },
+  { id:'energy',  name:'Energizante',  type:'equip',  price:400,  stats:'2× velocidad 60s\n[J/RS] usar' },
 ];
 
 const texLoader = new THREE.TextureLoader(); texLoader.crossOrigin = "Anonymous";
@@ -456,6 +504,8 @@ function hasLineOfSight(x1, y1, z1, x2, y2, z2) {
       if (tx > b.minX && tx < b.maxX && tz > b.minZ && tz < b.maxZ && ty > b.minY && ty < b.maxY) return false;
     }
   }
+  // Smoke also blocks LOS for AI/visibility/aim-assist
+  if (typeof segmentHitsSmoke === 'function' && segmentHitsSmoke(x1, y1, z1, x2, y2, z2)) return false;
   return true;
 }
 
@@ -701,6 +751,24 @@ function buildVM(id) {
       add(new THREE.CylinderGeometry(.025, .025, .2), mDarkMetal, [0, .065, -.08]).rotation.x = Math.PI/2; // Scope
       add(new THREE.BoxGeometry(.03, .08, .04), mDarkMetal, [0, -.03, -.02]); 
       add(new THREE.BoxGeometry(.036, .06, .18), mWood, [0, 0, .25]); 
+  } else if (id === 'railgun') {
+      // Cuerpo principal alargado, futurista
+      add(new THREE.BoxGeometry(.055, .08, .85), mDarkMetal, [0, .01, -.2]);
+      // Cañón con núcleo brillante (energía azul -> bloom)
+      const mCore = new THREE.MeshBasicMaterial({ color: 0x33ccff });
+      add(new THREE.CylinderGeometry(.022, .022, .8), mGunMetal, [0, .025, -.4]).rotation.x = Math.PI/2;
+      add(new THREE.CylinderGeometry(.012, .012, .82), mCore, [0, .025, -.4]).rotation.x = Math.PI/2;
+      // Bobinas (3 anillos)
+      for (let i = 0; i < 3; i++) {
+          const ring = add(new THREE.TorusGeometry(.04, .008, 8, 16), mCore, [0, .025, -.18 - i*0.18]);
+          ring.rotation.y = Math.PI/2;
+      }
+      // Empuñadura
+      add(new THREE.BoxGeometry(.04, .12, .055), mDarkMetal, [0, -.05, .02]);
+      // Culata
+      add(new THREE.BoxGeometry(.04, .07, .18), mDarkMetal, [0, .005, .25]);
+      // Pantalla / visor energético
+      add(new THREE.BoxGeometry(.05, .03, .05), mCore, [0, .07, -.05]);
   }
   return g;
 }
@@ -862,6 +930,181 @@ function dropWeapon(x, y, z, wepId, ammo) {
     droppedWeapons.push({ x, y, z, wepId, ammo, mesh, active: true });
 }
 
+// =====================================================================
+// GRENADE / EQUIPMENT SYSTEM
+// =====================================================================
+const grenades = [];     // active thrown grenades { type, x,y,z, vx,vy,vz, owner, fuse, mesh }
+const smokeClouds = [];  // active smoke clouds   { x,y,z, radius, life, maxLife, sprites:[] }
+
+const flashGeo = new THREE.SphereGeometry(0.09, 12, 12);
+const flashMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.4, metalness: 0.6, emissive: 0x222222 });
+const smokeGreGeo = new THREE.SphereGeometry(0.09, 12, 12);
+const smokeGreMat = new THREE.MeshStandardMaterial({ color: 0x335533, roughness: 0.7, metalness: 0.3 });
+
+function throwGrenade(p, type) {
+    if (p.dead || p.shopOpen) return false;
+    if (p.grenadeCD > 0) return false;
+    if (!p.inv[type] || p.inv[type] <= 0) { kfeed(p, `❌ Sin ${type === 'flash' ? 'flashbangs' : 'humo'}`); return false; }
+    p.inv[type]--;
+    p.grenadeCD = 0.4;
+    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(p.cam.quaternion);
+    const upBoost = new THREE.Vector3(0, 0.35, 0);
+    const start = p.cam.position.clone().add(forward.clone().multiplyScalar(0.5));
+    const vel = forward.multiplyScalar(14).add(upBoost.multiplyScalar(8));
+    const mesh = new THREE.Mesh(type === 'flash' ? flashGeo : smokeGreGeo, type === 'flash' ? flashMat : smokeGreMat);
+    mesh.castShadow = true;
+    mesh.position.copy(start);
+    scene.add(mesh);
+    grenades.push({
+        type, x: start.x, y: start.y, z: start.z,
+        vx: vel.x, vy: vel.y, vz: vel.z,
+        owner: p, fuse: type === 'flash' ? 1.6 : 1.8,
+        mesh
+    });
+    kfeed(p, type === 'flash' ? '💥 Flash lanzada' : '💨 Humo lanzado');
+    return true;
+}
+
+function useEnergizer(p) {
+    if (p.dead || p.shopOpen) return false;
+    if (!p.inv.energy || p.inv.energy <= 0) { kfeed(p, '❌ Sin energizantes'); return false; }
+    p.inv.energy--;
+    p.boostUntil = performance.now() + 60000; // 60s
+    kfeed(p, '⚡ Energizante: 2× velocidad 60s');
+    return true;
+}
+
+function updateGrenades(dt) {
+    PLEach(p => { if (p.grenadeCD > 0) p.grenadeCD -= dt; });
+
+    for (let i = grenades.length - 1; i >= 0; i--) {
+        const g = grenades[i];
+        g.fuse -= dt;
+        // physics
+        g.vy -= 18 * dt;
+        let nx = g.x + g.vx * dt, ny = g.y + g.vy * dt, nz = g.z + g.vz * dt;
+        const fy = getFloorY(nx, nz, 0.1);
+        // wall collision (simple): bounce on solid bodies
+        if (isCollidingWithMap(nx, ny, nz, 0.1, 0.1)) {
+            // Try axis-by-axis to slide
+            if (!isCollidingWithMap(g.x, ny, nz, 0.1, 0.1)) { g.vx = -g.vx * 0.4; nx = g.x; }
+            else if (!isCollidingWithMap(nx, g.y, nz, 0.1, 0.1)) { g.vy = -g.vy * 0.4; ny = g.y; }
+            else if (!isCollidingWithMap(nx, ny, g.z, 0.1, 0.1)) { g.vz = -g.vz * 0.4; nz = g.z; }
+            else { g.vx = -g.vx * 0.4; g.vz = -g.vz * 0.4; g.vy = -g.vy * 0.4; nx = g.x; ny = g.y; nz = g.z; }
+        }
+        // floor collision
+        if (ny <= fy + 0.1) {
+            ny = fy + 0.1;
+            if (g.vy < 0) g.vy = -g.vy * 0.45;
+            g.vx *= 0.75; g.vz *= 0.75;
+        }
+        g.x = nx; g.y = ny; g.z = nz;
+        g.mesh.position.set(g.x, g.y, g.z);
+        g.mesh.rotation.x += dt * 6; g.mesh.rotation.z += dt * 5;
+
+        if (g.fuse <= 0) {
+            if (g.type === 'flash') detonateFlash(g);
+            else detonateSmoke(g);
+            scene.remove(g.mesh);
+            grenades.splice(i, 1);
+        }
+    }
+
+    // smoke clouds expire
+    for (let i = smokeClouds.length - 1; i >= 0; i--) {
+        const s = smokeClouds[i];
+        s.life -= dt;
+        // fade sprites near end
+        const fade = Math.min(1, s.life / 1.5);
+        for (const sp of s.sprites) {
+            if (sp.material) sp.material.opacity = 0.55 * fade;
+        }
+        if (s.life <= 0) {
+            for (const sp of s.sprites) scene.remove(sp);
+            smokeClouds.splice(i, 1);
+        }
+    }
+}
+
+function detonateFlash(g) {
+    // VFX: bright burst + smoke
+    spawnParticles(new THREE.Vector3(g.x, g.y, g.z), 0xffffff, 30, 6, 0.5);
+    spawnParticles(new THREE.Vector3(g.x, g.y, g.z), 'smoke', 10, 2, 0.7);
+    if (audioReady) {
+        audioSys.gunNoise.volume.value = 8;
+        audioSys.gunNoise.triggerAttackRelease("4n", Tone.now());
+        audioSys.mechSynth.triggerAttackRelease("8n", Tone.now() + 0.05);
+    }
+    // Blind any player who is looking at the flashpoint and has line of sight
+    PLEach(p => {
+        if (p.dead) return;
+        const dx = g.x - p.cam.position.x, dy = g.y - p.cam.position.y, dz = g.z - p.cam.position.z;
+        const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+        if (dist > 22) return;
+        if (!hasLineOfSight(p.cam.position.x, p.cam.position.y, p.cam.position.z, g.x, g.y, g.z)) return;
+        // Forward vector of player camera
+        const fwd = new THREE.Vector3(0,0,-1).applyQuaternion(p.cam.quaternion).normalize();
+        const toFlash = new THREE.Vector3(dx, dy, dz).normalize();
+        const dot = fwd.dot(toFlash);
+        // dot 1.0 = looking exactly at flash; >0 = in field of view
+        // Half FOV ~ 0 means dot > 0.0; require dot > 0.15 (looking towards it)
+        if (dot < 0.15) return;
+        // Strength based on how directly they look at it and proximity
+        const facing = (dot - 0.15) / 0.85;             // 0..1
+        const proximity = 1 - (dist / 22);              // 0..1
+        const strength = Math.min(1, facing * 0.7 + proximity * 0.5);
+        const durationMs = 2000 * strength;             // up to 2s
+        if (durationMs < 250) return;
+        const until = performance.now() + durationMs;
+        if (until > p.blindUntil) p.blindUntil = until;
+        kfeed(p, `😵 ¡CEGADO ${(durationMs/1000).toFixed(1)}s!`);
+    });
+}
+
+function detonateSmoke(g) {
+    // Place a smoke cloud that lasts 10s, radius 5
+    const radius = 5;
+    const lifeT = 10;
+    spawnParticles(new THREE.Vector3(g.x, g.y, g.z), 'smoke', 6, 1, 1.2);
+    if (audioReady) {
+        audioSys.gunNoise.volume.value = -2;
+        audioSys.gunNoise.triggerAttackRelease("2n", Tone.now());
+    }
+    // Build a persistent volumetric-ish smoke from many sprites
+    const sprites = [];
+    const count = 22;
+    for (let i = 0; i < count; i++) {
+        const sp = new THREE.Sprite(smokeMat.clone());
+        sp.material.opacity = 0.55;
+        const ang = Math.random() * Math.PI * 2;
+        const r = Math.random() * radius * 0.85;
+        sp.position.set(g.x + Math.cos(ang)*r, g.y + 0.4 + Math.random() * radius * 0.7, g.z + Math.sin(ang)*r);
+        const sc = 2.6 + Math.random() * 1.6;
+        sp.scale.set(sc, sc, sc);
+        scene.add(sp);
+        sprites.push(sp);
+    }
+    smokeClouds.push({ x: g.x, y: g.y, z: g.z, radius, life: lifeT, maxLife: lifeT, sprites });
+}
+
+// Returns true if a straight segment passes through any active smoke cloud
+function segmentHitsSmoke(x1, y1, z1, x2, y2, z2) {
+    if (smokeClouds.length === 0) return false;
+    const dx = x2 - x1, dy = y2 - y1, dz = z2 - z1;
+    const segLen2 = dx*dx + dy*dy + dz*dz;
+    if (segLen2 < 1e-6) return false;
+    for (const s of smokeClouds) {
+        // Closest point of segment to sphere center
+        const ex = s.x - x1, ey = s.y - y1, ez = s.z - z1;
+        let t = (ex*dx + ey*dy + ez*dz) / segLen2;
+        t = Math.max(0, Math.min(1, t));
+        const cx2 = x1 + dx*t, cy2 = y1 + dy*t, cz2 = z1 + dz*t;
+        const ddx = cx2 - s.x, ddy = cy2 - s.y, ddz = cz2 - s.z;
+        if (ddx*ddx + ddy*ddy + ddz*ddz < s.radius * s.radius) return true;
+    }
+    return false;
+}
+
 const r1 = new THREE.WebGLRenderer({ canvas: document.getElementById('c1'), antialias: false }); 
 r1.setPixelRatio(Math.min(window.devicePixelRatio, 2)); r1.shadowMap.enabled = true; r1.shadowMap.type = THREE.PCFSoftShadowMap; r1.autoClear = false; 
 
@@ -903,11 +1146,15 @@ function makeP(idx, sx, sz, yaw) {
 
   const p = {
     idx, hp: 100, maxHp: 100, armor: 0, maxArmor: 0, credits: 1000, weapons: ['knife', null], slot: 0, 
-    ammo: { pistol: 12, smg: 20, shotgun: 15, rifle: 30, sniper: 5 }, reloading: false, reloadLeft: 0, lastShot: 0, 
+    ammo: { pistol: 12, smg: 20, shotgun: 15, rifle: 30, sniper: 5, railgun: 4 }, reloading: false, reloadLeft: 0, lastShot: 0, 
     stats: { kills: 0, deaths: 0, shots: 0, hits: 0, headshots: 0 },
     yaw, pitch: 0, dead: false, shopOpen: false, shopCursor: 0, showScoreboard: false,
     cam, model, vmCam: null, vmGroup: null, vmCurrent: null,
-    vy: 0, floorY: 0, isCrouching: false, isAiming: false, recoilPitch: 0, recoilYaw: 0, lastStepTime: 0
+    vy: 0, floorY: 0, isCrouching: false, isAiming: false, recoilPitch: 0, recoilYaw: 0, lastStepTime: 0,
+    inv: { flash: 0, smoke: 0, energy: 0 },
+    blindUntil: 0,        // ms timestamp until which the player is blinded
+    boostUntil: 0,        // ms timestamp until speed boost ends
+    grenadeCD: 0          // ms cooldown to avoid double-throw
   };
   setupPlayerVM(p); setVM(p, 'knife'); return p;
 }
@@ -982,12 +1229,93 @@ function tryShoot(p) {
   
   const spread = (w.spread || .01) * recoilMult;
   for (let i = 0; i < (w.pellets || 1); i++) doRay(p, w, spread);
+  // Railgun: spawn a glowing energy beam from muzzle in the look direction
+  if (w.id === 'railgun') spawnRailBeam(p, w);
+}
+
+function spawnRailBeam(p, w) {
+    const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(p.cam.quaternion).normalize();
+    const start = p.cam.position.clone().add(dir.clone().multiplyScalar(0.4));
+    const len = w.range;
+    const geom = new THREE.CylinderGeometry(0.04, 0.04, len, 10, 1, true);
+    const mat = new THREE.MeshBasicMaterial({ color: 0x33ddff, transparent: true, opacity: 0.85, depthWrite: false, blending: THREE.AdditiveBlending });
+    const beam = new THREE.Mesh(geom, mat);
+    // Position the beam: cylinder is along Y axis - rotate to align with dir
+    beam.position.copy(start).add(dir.clone().multiplyScalar(len / 2));
+    const up = new THREE.Vector3(0, 1, 0);
+    const quat = new THREE.Quaternion().setFromUnitVectors(up, dir);
+    beam.quaternion.copy(quat);
+    scene.add(beam);
+    // Light flash for bloom
+    muzzleLight.color.setHex(0x33ccff);
+    muzzleLight.position.copy(start);
+    muzzleLight.intensity = 6;
+    setTimeout(() => { muzzleLight.intensity = 0; muzzleLight.color.setHex(0xffaa00); }, 80);
+    // Fade out
+    let life = 0.35;
+    const fadeInterval = setInterval(() => {
+        life -= 0.03;
+        beam.material.opacity = Math.max(0, life * 2.4);
+        beam.scale.x *= 0.92; beam.scale.z *= 0.92;
+        if (life <= 0) { clearInterval(fadeInterval); scene.remove(beam); }
+    }, 25);
 }
 
 function doRay(p, w, spread) {
   const ox = (Math.random() - .5) * spread * 2, oy = (Math.random() - .5) * spread * 2; 
   rc.setFromCamera({ x: ox, y: oy }, p.cam);
   const ro = rc.ray.origin, rd = rc.ray.direction;
+
+  // RAILGUN: atraviesa paredes Y enemigos (golpea a TODOS los blancos en línea recta hasta el rango)
+  if (w.pierceWalls && w.pierceTargets) {
+      // Spawn light decal at first wall intersection (purely cosmetic) but DO NOT block damage
+      const wallInts = rc.intersectObjects(wallMeshes);
+      if (wallInts.length > 0 && wallInts[0].distance < w.range) {
+          if (!wallInts[0].object.geometry.parameters.radius) {
+              spawnDecal(wallInts[0].point, wallInts[0].face.normal);
+          }
+          spawnParticles(wallInts[0].point, 0x33ccff, 8, 3, 0.3);
+      }
+      // Collect every target (enemy or opponent player) hit by the ray within range
+      const hits = [];
+      const checkPierce = (target, isPl) => {
+          let zone = null, dist = Infinity;
+          const chk = (pos, r2, z) => {
+              const oc = new THREE.Vector3().subVectors(ro, pos), b = oc.dot(rd), c = oc.dot(oc) - r2 * r2, disc = b * b - c;
+              if (disc >= 0) { const t2 = -b - Math.sqrt(disc); if (t2 > 0 && t2 < dist) { dist = t2; zone = z; } }
+          };
+          if (isPl) {
+              const cy = target.cam.position.y;
+              chk(new THREE.Vector3(target.cam.position.x, cy, target.cam.position.z), .25, 'head');
+              chk(new THREE.Vector3(target.cam.position.x, cy - 0.5, target.cam.position.z), .35, 'chest');
+              chk(new THREE.Vector3(target.cam.position.x, cy - 1.2, target.cam.position.z), .3, 'legs');
+          } else {
+              chk(target.getHeadPos(), .23, 'head');
+              chk(target.getTorsoPos(), .33, 'chest');
+              chk(target.getLegsPos(), .27, 'legs');
+          }
+          if (zone && dist < w.range) hits.push({ target, isPl, zone, dist });
+      };
+      for (const e of enemies) { if (!e.dead) checkPierce(e, false); }
+      const op = p.idx === 0 ? P2 : P1; if (splitActive && !op.dead) checkPierce(op, true);
+      // Sort by distance and apply damage to all
+      hits.sort((a, b) => a.dist - b.dist);
+      for (const h of hits) {
+          p.stats.hits++; const isHead = (h.zone === 'head'); if (isHead) p.stats.headshots++;
+          const hpVec = ro.clone().add(rd.clone().multiplyScalar(h.dist));
+          spawnParticles(hpVec, 'blood', 12, 3, 0.4);
+          const dmg = isHead ? w.dmgHead : h.zone === 'legs' ? w.dmgLegs : w.dmgChest;
+          playHitSound(isHead); showHit(p, isHead);
+          if (h.isPl) { kfeed(p, `⚡ P${h.target.idx + 1} [${h.zone}]: -${dmg}hp`); dmgPlayer(h.target, dmg, p); }
+          else {
+              const killed = h.target.takeDamage(dmg);
+              kfeed(p, isHead ? `⚡ HS RAIL: -${dmg}hp` : `⚡ Rail [${h.zone}]: -${dmg}hp`);
+              if (killed) { enemies = enemies.filter(x => x.id !== h.target.id); enemiesKilled++; p.stats.kills++; p.credits += 100 + round * 50; kfeed(p, `☠ Eliminado! +${100 + round * 50}cr`); checkRE(); }
+          }
+      }
+      return;
+  }
+
   let wallDist = w.range, hitBody = null;
   
   // Intersect walls for accurate decals
@@ -1073,7 +1401,8 @@ function enemyShoot(e) {
   PLEach(p => {
     if (p.dead) return; const dx = p.cam.position.x - e.x, dz = p.cam.position.z - e.z, dist = Math.sqrt(dx*dx + dz*dz);
     if (dist > w.range || !hasLineOfSight(e.x, e.y + 1.06, e.z, p.cam.position.x, p.cam.position.y - 0.5, p.cam.position.z)) return;
-    if (Math.random() < 0.20) { const mp = p.cam.position.clone().add(new THREE.Vector3((Math.random()-.5)*3, (Math.random()-.5)*3, (Math.random()-.5)*3)); spawnParticles(mp, 0xaaaaaa, 6, 2, 0.3); return; }
+    // Precisión de bots reducida al 50%: 50% de probabilidad de fallar el disparo
+    if (Math.random() < 0.50) { const mp = p.cam.position.clone().add(new THREE.Vector3((Math.random()-.5)*3, (Math.random()-.5)*3, (Math.random()-.5)*3)); spawnParticles(mp, 0xaaaaaa, 6, 2, 0.3); return; }
     const zr = Math.random(); let dmg = w.dmgChest || w.dmgFront || 20; if (zr < .1) dmg = w.dmgHead || dmg * 2; else if (zr < .3) dmg = w.dmgLegs || dmg * .6;
     dmgPlayer(p, Math.round(dmg), e);
   });
@@ -1125,17 +1454,42 @@ function closeShop(p) { p.shopOpen = false; document.getElementById('shop' + (p.
 function buildShop(p) {
   const n = p.idx + 1; document.getElementById('scr' + n).textContent = 'Créditos: ' + p.credits;
   if (n === 1) document.getElementById('stitle1').textContent = `🛒 Armería J1 — [${BIND_P1.shop}] cerrar`; else document.getElementById('stitle2').textContent = `🛒 Armería J2 — [Botón ${BTN_NAMES[BIND_P2.close] || BIND_P2.close}] cerrar`;
-  ['sw', 'sa'].forEach(id => document.getElementById(id + n).innerHTML = '');
+  ['sw', 'sa', 'se'].forEach(id => { const el = document.getElementById(id + n); if (el) el.innerHTML = ''; });
   SHOP_DATA.forEach((item, i) => {
     const div = document.createElement('div'); div.className = 'si'; div.setAttribute('data-idx', i);
-    const owned = item.type === 'weapon' && p.weapons.includes(item.id), poor = p.credits < item.price;
+    const owned = item.type === 'weapon' && p.weapons.includes(item.id);
+    const poor = p.credits < item.price;
     if (owned) div.classList.add('owned'); else if (poor) div.classList.add('poor');
-    div.innerHTML = `<div class="si-name">${item.name}</div><div class="si-stat">${item.stats}</div><div class="si-price">💰 ${item.price}cr${owned ? ' ✓' : ''}</div>`;
+    let suffix = '';
+    if (item.type === 'equip' && p.inv && p.inv[item.id === 'flash' ? 'flash' : item.id === 'smoke' ? 'smoke' : 'energy'] !== undefined) {
+        const key = item.id === 'flash' ? 'flash' : item.id === 'smoke' ? 'smoke' : 'energy';
+        suffix = ` (×${p.inv[key]})`;
+    }
+    div.innerHTML = `<div class="si-name">${item.name}${suffix}</div><div class="si-stat">${item.stats}</div><div class="si-price">💰 ${item.price}cr${owned ? ' ✓' : ''}</div>`;
     if (!owned && !poor && p.idx === 0) div.onclick = () => buyItem(p, item);
-    document.getElementById((item.type === 'weapon' ? 'sw' : 'sa') + n).appendChild(div);
+    const targetId = item.type === 'weapon' ? 'sw' : item.type === 'armor' ? 'sa' : 'se';
+    document.getElementById(targetId + n).appendChild(div);
   }); hlCursor(p);
 }
-function buyItem(p, item) { if (p.credits < item.price) return; p.credits -= item.price; if (item.type === 'weapon') { p.weapons[1] = item.id; kfeed(p, `🛒 ${item.name} comprado`); } else { p.armor = item.bonus; p.maxArmor = item.bonus; kfeed(p, `🛡 Chaleco equipado`); } buildShop(p); }
+function buyItem(p, item) {
+    if (p.credits < item.price) return;
+    if (item.type === 'weapon' && p.weapons.includes(item.id)) return;
+    p.credits -= item.price;
+    if (item.type === 'weapon') {
+        p.weapons[1] = item.id;
+        // Refill ammo on purchase
+        if (WDATA[item.id] && WDATA[item.id].ammoKey) p.ammo[WDATA[item.id].ammoKey] = MAX_AMMO[WDATA[item.id].ammoKey];
+        kfeed(p, `🛒 ${item.name} comprado`);
+    } else if (item.type === 'armor') {
+        p.armor = item.bonus; p.maxArmor = item.bonus;
+        kfeed(p, `🛡 Chaleco equipado`);
+    } else if (item.type === 'equip') {
+        const key = item.id === 'flash' ? 'flash' : item.id === 'smoke' ? 'smoke' : 'energy';
+        p.inv[key] = (p.inv[key] || 0) + 1;
+        kfeed(p, `🎒 ${item.name} +1`);
+    }
+    buildShop(p);
+}
 function hlCursor(p) { document.querySelectorAll(`#shop${p.idx + 1} .si`).forEach((el, i) => { el.style.outline = i === p.shopCursor ? '2px solid #fc0' : 'none'; }); }
 function shopNav(p, d) { const items = document.querySelectorAll(`#shop${p.idx + 1} .si`); if (items.length === 0) return; p.shopCursor = (p.shopCursor + d + items.length) % items.length; hlCursor(p); }
 function shopBuy(p) { const el = Array.from(document.querySelectorAll(`#shop${p.idx + 1} .si`))[p.shopCursor]; if (!el) return; const item = SHOP_DATA[parseInt(el.getAttribute('data-idx'))]; if (item && !el.classList.contains('owned') && !el.classList.contains('poor')) buyItem(p, item); }
@@ -1158,6 +1512,8 @@ function updateP(p, dt, mx, mz, dyaw, dpitch, isSprinting, jumpPressed) {
   fv.set(-Math.sin(p.yaw), 0, -Math.cos(p.yaw)); rv.set(Math.cos(p.yaw), 0, -Math.sin(p.yaw)); mv.set(0, 0, 0).addScaledVector(fv, mz).addScaledVector(rv, mx);
   const moving = mv.length() > .0001; if (moving) mv.normalize();
   let speedMult = p.isCrouching ? 0.5 : p.isAiming ? 0.7 : isSprinting ? 1.5 : 1.0;
+  // Energizante: doble velocidad durante 60s
+  if (p.boostUntil && performance.now() < p.boostUntil) speedMult *= 2.0;
   const spd = 4.5 * speedMult * dt, nx = p.cam.position.x + mv.x * spd, nz = p.cam.position.z + mv.z * spd;
   p.floorY = getFloorY(p.cam.position.x, p.cam.position.z, PR); const pHeight = p.isCrouching ? PH * 0.6 : PH;
   if (!isCollidingWithMap(nx, p.cam.position.y - pHeight + 0.1, p.cam.position.z, PR, pHeight - 0.2)) p.cam.position.x = nx;
@@ -1207,6 +1563,16 @@ document.getElementById('settingsbtn').onclick = () => { document.getElementById
 document.getElementById('close-settings').onclick = () => { isListening = false; document.getElementById('settings-menu').classList.remove('open'); syncUI(); };
 document.getElementById('startbtn').addEventListener('click', () => { initAudioSystem(); document.getElementById('c1').requestPointerLock(); });
 
+// Shop close (X) buttons - mouse click closes shop and re-locks cursor automatically
+document.getElementById('shop-close1').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (P1.shopOpen) closeShop(P1);
+});
+document.getElementById('shop-close2').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (P2.shopOpen) closeShop(P2);
+});
+
 document.addEventListener('keydown', e => {
   if (isListening && listenTarget && listenTarget.p === 'p1') { BIND_P1[listenTarget.action] = e.code; listenTarget.el.textContent = e.code; listenTarget.el.classList.remove('listening'); isListening = false; return; }
   keys[e.code] = true; if (e.code === BIND_P1.crouch) P1.isCrouching = true;
@@ -1216,6 +1582,9 @@ document.addEventListener('keydown', e => {
   if (e.code === 'Escape') { if (P1.shopOpen) { closeShop(P1); return; } }
   if (P1.shopOpen) return;
   if (e.code === BIND_P1.shop && locked) openShop(P1); if (e.code === BIND_P1.w1) switchWep(P1, 0); if (e.code === BIND_P1.w2) switchWep(P1, 1); if (e.code === BIND_P1.reload) startReload(P1);
+  if (e.code === BIND_P1.gFlash) throwGrenade(P1, 'flash');
+  if (e.code === BIND_P1.gSmoke) throwGrenade(P1, 'smoke');
+  if (e.code === BIND_P1.gEnergy) useEnergizer(P1);
 });
 
 document.addEventListener('keyup', e => { keys[e.code] = false; if (e.code === BIND_P1.crouch) P1.isCrouching = false; if (e.code === BIND_P1.score) { P1.showScoreboard = false; document.getElementById('sb-overlay1').classList.remove('open'); } });
@@ -1263,6 +1632,9 @@ function pollGP(dt) {
   if (w2?.auto && rtOn) tryShoot(P2); else if (rtOn && !GP.rtPrev) tryShoot(P2); GP.rtPrev = rtOn;
   
   if (gBR(gp, BIND_P2.reload)) startReload(P2); if (gBR(gp, BIND_P2.wNext)) switchWep(P2, P2.slot === 0 ? 1 : 0); if (gBR(gp, BIND_P2.wPrev)) switchWep(P2, P2.slot === 0 ? 1 : 0); if (gBR(gp, BIND_P2.shop) && !P2.dead) openShop(P2);
+  if (gBR(gp, BIND_P2.gFlash)) throwGrenade(P2, 'flash');
+  if (gBR(gp, BIND_P2.gSmoke)) throwGrenade(P2, 'smoke');
+  if (gBR(gp, BIND_P2.gEnergy)) useEnergizer(P2);
   for (let i = 0; i < gp.buttons.length; i++) GP.prev[i] = gp.buttons[i]?.pressed || false;
 }
 
@@ -1297,6 +1669,39 @@ function updateHUD(p) {
   const w = curW(p); document.getElementById('wname' + n).textContent = w ? w.name : '—'; document.getElementById('ammo' + n).textContent = w && w.type !== 'melee' ? p.ammo[w.ammoKey] : '∞'; document.getElementById('ammosm' + n).textContent = w && w.type !== 'melee' ? '/ ' + MAX_AMMO[w.ammoKey] : '';
   document.getElementById('sl' + n + 'a').className = 'slot' + (p.slot === 0 ? ' on' : ''); document.getElementById('sl' + n + 'b').className = 'slot' + (p.slot === 1 ? ' on' : ''); document.getElementById('sl' + n + 'b').textContent = '2 · ' + (p.weapons[1] ? WDATA[p.weapons[1]].name : '—');
   document.getElementById('rtr' + n).textContent = `RONDA ${round} / ${MAX_ROUNDS}`; document.getElementById('rtk' + n).textContent = `${enemiesKilled}/${enemiesTotal} enemigos · ${p.stats.kills} bajas`;
+
+  // Granadas / equipamiento HUD
+  const flashKey = p.idx === 0 ? `[${BIND_P1.gFlash.replace('Key','')}]` : `BTN ${BTN_NAMES[BIND_P2.gFlash] || BIND_P2.gFlash}`;
+  const smokeKey = p.idx === 0 ? `[${BIND_P1.gSmoke.replace('Key','')}]` : `BTN ${BTN_NAMES[BIND_P2.gSmoke] || BIND_P2.gSmoke}`;
+  const energyKey = p.idx === 0 ? `[${BIND_P1.gEnergy.replace('Key','')}]` : `BTN ${BTN_NAMES[BIND_P2.gEnergy] || BIND_P2.gEnergy}`;
+  const gf = document.getElementById('gflash' + n), gs = document.getElementById('gsmoke' + n), ge = document.getElementById('genergy' + n);
+  if (gf) { gf.innerHTML = `<span class="gr-key">${flashKey}</span>FLASH ×${p.inv.flash || 0}`; gf.classList.toggle('empty', !p.inv.flash); }
+  if (gs) { gs.innerHTML = `<span class="gr-key">${smokeKey}</span>HUMO ×${p.inv.smoke || 0}`; gs.classList.toggle('empty', !p.inv.smoke); }
+  if (ge) { ge.innerHTML = `<span class="gr-key">${energyKey}</span>ENERGIZANTE ×${p.inv.energy || 0}`; ge.classList.toggle('empty', !p.inv.energy); }
+  // Boost timer + vignette
+  const bh = document.getElementById('boost' + n), bv = document.getElementById('bv' + n);
+  const now = performance.now();
+  if (p.boostUntil && now < p.boostUntil) {
+      const remaining = Math.ceil((p.boostUntil - now) / 1000);
+      if (bh) { bh.textContent = `⚡ BOOST ${remaining}s`; bh.classList.add('active'); }
+      if (bv) bv.classList.add('active');
+  } else {
+      if (bh) bh.classList.remove('active');
+      if (bv) bv.classList.remove('active');
+  }
+  // Flash blind overlay (per-viewport, only that player's screen)
+  const fl = document.getElementById('fl' + n);
+  if (fl) {
+      if (p.blindUntil && now < p.blindUntil) {
+          // Strong fade: 1.0 fresh -> fades to 0 near the end
+          const left = (p.blindUntil - now) / 2000; // 0..1
+          fl.style.opacity = Math.max(0, Math.min(1, left * 1.4));
+          fl.classList.add('active');
+      } else {
+          fl.style.opacity = 0;
+          fl.classList.remove('active');
+      }
+  }
 }
 
 function kfeed(p, txt) { const kf = document.getElementById('kf' + (p.idx + 1)); while (kf.children.length >= 6) kf.removeChild(kf.firstChild); const d = document.createElement('div'); d.className = 'kf'; d.textContent = txt; kf.appendChild(d); setTimeout(() => { try { kf.removeChild(d); } catch (e) {} }, 3000); }
@@ -1339,6 +1744,7 @@ function loop(ts) {
     for (const e of enemies) { if (e.dead) continue; e.shootTimer = (e.shootTimer || 0) + dt; if (e.shootTimer >= WDATA[e.wepId].firerate / 1000 * 2.2 && e.state === 'chase') { e.shootTimer = 0; enemyShoot(e); } }
     
     updateVFX(dt);
+    updateGrenades(dt);
     for (let w of droppedWeapons) if (w.active) w.mesh.rotation.y += dt * 1.5;
   }
 
